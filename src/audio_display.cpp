@@ -1261,7 +1261,7 @@ void AudioDisplay::OnTimingController()
 	}
 }
 
-void AudioDisplay::OnPlaybackPosition(int ms)
+void AudioDisplay::OnPlaybackPosition(int ms, int edge_ratio)
 {
 	int pixel_position = AbsoluteXFromTime(ms);
 	SetTrackCursor(pixel_position, false);
@@ -1269,7 +1269,17 @@ void AudioDisplay::OnPlaybackPosition(int ms)
 	if (OPT_GET("Audio/Lock Scroll on Cursor")->GetBool())
 	{
 		int client_width = GetClientSize().GetWidth();
-		int edge_size = client_width / 20;
+		// Scroll audio view if cursor distance from right edge is excess 5 - 50% the length of audio view
+		//WIP 20170731 Add option to change edge ration in UI
+		if (edge_ratio > 5 && edge_ratio <= 50)
+		{
+			int edge_size = client_width * edge_ratio / 100;
+		}
+		else 
+		{
+			//Default to 5%
+			int edge_size = client_width / 20;
+		}
 		if (scroll_left > 0 && pixel_position < scroll_left + edge_size)
 		{
 			ScrollPixelToLeft(std::max(pixel_position - edge_size, 0));
